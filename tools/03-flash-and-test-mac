@@ -1,0 +1,16 @@
+#!/bin/sh
+OLDDEVS=`ls /dev/tty.usbmodem* 2>/dev/null`
+echo "Please connect the PCB's USB cable to your computer and hit ENTER or RETURN"
+read newline
+sleep 2; # wait a few seconds to recognize the device
+NEWDEVS=`ls /dev/tty.usbmodem* 2>/dev/null`
+DEVICE=`echo "$OLDDEVS\n$NEWDEVS"|sort |uniq -u`
+if [`echo $DEVICE|wc -l` -lt 1 ]; then
+    echo "ERROR: Could not find the PCB device. If Step 2 ran ok, maybe our device detection is broken?\n";
+    exit -1;
+elif [ `echo $DEVICE|wc -l` -gt 1 ]; then 
+    echo "ERROR: Multiple new usbserial devices appeared. Did you plug in two boards?\n";
+    exit -1;
+else
+    echo "OK: We found the board. Time to flash firmware on $DEVICE";
+fi

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if  system_profiler SPUSBDataType | grep -q '0x8037';  then
-    echo "OK. Device found.\n";
+    echo "OK. Device found.\nPlease DISCONNECT the USB cable between the PCB and your computer.\nThen, type '03-flash-and-test-mac'";
     exit 0;
 else
 
