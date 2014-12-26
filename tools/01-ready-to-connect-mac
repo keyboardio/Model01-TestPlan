@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if  system_profiler SPUSBDataType | grep -q '0x8037';  then
+echo "ERROR. Device appears to be connected already.\n(Or you have an Arduino Micro connected.) \n\nPlease check your USB devices and retry this step";
+exit -1;
+else
+
+echo "OK. No device connected. Please connect the PCB to the USB port.\nThen type './02-device-found-mac'"
+exit 0;
+fi

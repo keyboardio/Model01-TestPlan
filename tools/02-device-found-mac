@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if  system_profiler SPUSBDataType | grep -q '0x8037';  then
+    echo "OK. Device found.\n";
+    exit 0;
+else
+
+echo "ERROR. Device not found.\n\nPlease check your USB cable and retry this step.\nIf this step failed, you might have a bad USB socket\nor might not have flashed the bootloader on the ATmega yet.\n";
+exit -1;
+fi
