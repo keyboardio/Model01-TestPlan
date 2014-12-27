@@ -31,35 +31,10 @@ fi
 
 stty -f $DEVICE 1200
 sleep 2
-if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/test.hex:i; then
-    echo "OK: Flashing worked\n";
+if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/noop.hex:i; then
+    echo "OK: Flashing worked\nYou can start testing again\n";
+    exit 0;
 else 
     echo "ERROR: Flashing failed\n";
     exit -1;
 fi
-
-
-echo "Testing basic USB device connectivity.\nPlease do not touch the keyboard.\n";
-
-read basic_connectivity
-
-if [ "$basic_connectivity" == "#MCU Connected OK" ]; then
-    echo "OK: The MCU can tell us if it's working all right";
-else
-    echo "ERROR: something went wrong. Did flashing fail?\n";
-fi
-
-read has_io_expander
-
-if [ "$has_io_expander" == "#MCU Connected OK" ]; then
-    read has_io_expander
-fi
-
-if [ "$has_io_expander" == "#IO Expander found at 0x00" ]; then
-    echo "OK: PASS.\nThis prototype board is ready for shipment to Keyboardio\n";
-    exit 0;
-else
-    echo "ERROR Something bad happened.\nThe SX1509 IO Expander could not be initialized\n";
-    exit -1;
-fi
-
