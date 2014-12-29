@@ -1,0 +1,20 @@
+#!/bin/sh
+echo "This program will install the ICSP software on an Arduino Micro.\n"
+echo "This will ERASE your Arduino and install the ArduinoISP software.\n"
+
+
+port_tmp_file=`mktemp -t kbio-port`
+./probe-device $port_tmp_file
+DEVICE=`cat $port_tmp_file`
+rm $port_tmp_file
+
+
+stty -f $DEVICE 1200
+sleep 1
+if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/arduino-isp.hex:i; then
+    echo "OK: Flashing worked\n";
+    exit 0;
+else 
+    echo "ERROR: Flashing failed\n";
+    exit -1;
+fi
