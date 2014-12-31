@@ -1,21 +1,26 @@
-#!/bin/sh
-echo "This program will install the ICSP software on an Arduino Micro."
-echo "This will ERASE your Arduino and install the ArduinoISP software."
-echo "\nYou only need to run this at the beginnging of a test session."
+#!/bin/bash
 
-port_tmp_file=`mktemp -t kbio-port`
+STTY="stty -F"
+ECHO="echo -e"
+
+$ECHO "This program will install the ICSP software on an Arduino Micro."
+$ECHO "This will ERASE your Arduino and install the ArduinoISP software."
+$ECHO ""
+$ECHO "You only need to run this at the beginnging of a test session."
+
+port_tmp_file=`mktemp -t kbio-port-XXXX`
 ./probe-device $port_tmp_file
 DEVICE=`cat $port_tmp_file`
 rm $port_tmp_file
 
 if [ "x$DEVICE" == "x" ]; then exit -1; fi
 
-stty -f $DEVICE 1200
+$STTY $DEVICE 1200
 sleep 1
-if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/arduino-isp.hex:i  2> /tmp/keyboardio-log.$$; then
-    echo "OK: Flashing worked. Your Arduino is now an ISP.";
+if ../binaries/`uname`/avrdude/avrdude -V -C../binaries/`uname`/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/arduino-isp.hex:i  2> /tmp/keyboardio-log.$$; then
+    $ECHO "OK: Flashing worked. Your Arduino is now an ISP.";
     exit 0;
 else 
-    echo "ERROR: Flashing failed. Sometimes, you can just try again.";
+    $ECHO "ERROR: Flashing failed. Sometimes, you can just try again.";
     exit -1;
 fi

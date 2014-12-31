@@ -1,6 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
-echo "Connect the Arduino Micro being used as Programmer to the
+STTY="stty -F"
+ECHO="echo -e"
+
+
+$ECHO "Connect the Arduino Micro being used as Programmer to the
 ICSP header on the Keyboardio PCB:
 
 Connections on Arduino Micro to Keyboardio PCB:
@@ -16,54 +20,54 @@ SCK         SCK               Pin 1 is the SQUARE pin.
 
 read xxx
 
-port_tmp_file=`mktemp -t kbio-port`
+port_tmp_file=`mktemp -t kbio-port-XXXX`
 ./probe-device $port_tmp_file
 DEVICE=`cat $port_tmp_file`
 rm $port_tmp_file
 
 if [ "x$DEVICE" == "x" ]; then exit -1; fi
 
-stty -f $DEVICE 1200
+$STTY $DEVICE 1200
 
-echo "Setting fuses...\c"
+$ECHO "Setting fuses...\c"
 
-if  ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cstk500v1 -P$DEVICE -b19200 -e -Ulock:w:0x3F:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xff:m 2>/tmp/keyboardio-log.$$ ; then
-    echo "done";
+if  ../binaries/`uname`/avrdude/avrdude -V -C../binaries/`uname`/avrdude/avrdude.conf -patmega32u4 -cstk500v1 -P$DEVICE -b19200 -e -Ulock:w:0x3F:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xff:m 2>/tmp/keyboardio-log.$$ ; then
+    $ECHO "done";
 else 
-    echo "ERROR: Fuse setting failed";
+    $ECHO "ERROR: Fuse setting failed";
     exit -1;
 fi
 
 
-echo "Flashing bootloader...\c";
+$ECHO "Flashing bootloader...\c";
 
-if  ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cstk500v1 -P$DEVICE -b19200 -Uflash:w:../firmware/bootloader.hex:i -Ulock:w:0x2F:m 2>/tmp/keyboardio-log.$$ ; then
-    echo "done";
+if  ../binaries/`uname`/avrdude/avrdude -V -C../binaries/`uname`/avrdude/avrdude.conf -patmega32u4 -cstk500v1 -P$DEVICE -b19200 -Uflash:w:../firmware/bootloader.hex:i -Ulock:w:0x2F:m 2>/tmp/keyboardio-log.$$ ; then
+    $ECHO "done";
 else 
-    echo "ERROR: Flashing setting failed";
+    $ECHO "ERROR: Flashing setting failed";
     exit -1;
 fi
 
 
-echo "Please disconnect the Arduino ISP from the test PCB"
-echo "From now on, you should only connect the USB cable to the LEFT PCB"
+$ECHO "Please disconnect the Arduino ISP from the test PCB"
+$ECHO "From now on, you should only connect the USB cable to the LEFT PCB"
 
-port_tmp_file=`mktemp -t kbio-port`
+port_tmp_file=`mktemp -t kbio-port-XXXX`
 ./probe-device $port_tmp_file "LEFT PCB"
 DEVICE=`cat $port_tmp_file`
 rm $port_tmp_file
 
-stty -f $DEVICE 1200
-stty -f $DEVICE 1200
-stty -f $DEVICE 1200
+$STTY $DEVICE 1200
+$STTY $DEVICE 1200
+$STTY $DEVICE 1200
 sleep 2
 
-echo "Flashing test firmware...\c"
+$ECHO "Flashing test firmware...\c"
 
-if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/test.hex:i  2>/tmp/keyboardio-log.$$ ; then
-    echo "done";
+if ../binaries/`uname`/avrdude/avrdude -V -C../binaries/`uname`/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/test.hex:i  2>/tmp/keyboardio-log.$$ ; then
+    $ECHO "done";
 else 
-    echo "ERROR: Flashing failed\n";
+    $ECHO "ERROR: Flashing failed\n";
     exit -1;
 fi
 
@@ -71,30 +75,30 @@ if [ "x$DEVICE" == "x" ]; then
     exit -1;
 fi
 
-echo "Testing basic USB device connectivity.\nPlease do not touch the keyboard.";
+$ECHO "Testing basic USB device connectivity.\nPlease do not touch the keyboard.";
 
 read basic_connectivity
 
-echo "Detecting MCU...\c"
+$ECHO "Detecting MCU...\c"
 if [ "$basic_connectivity" == "#MCU Connected OK" ]; then
-    echo "found.";
+    $ECHO "found.";
 else
-    echo "ERROR: something went wrong. Did flashing fail?\n";
+    $ECHO "ERROR: something went wrong. Did flashing fail?\n";
 fi
 
 read has_io_expander
 
-echo "Testing SX1509...\c"
+$ECHO "Testing SX1509...\c"
 if [ "$has_io_expander" == "#MCU Connected OK" ]; then
     read has_io_expander
 fi
 
 if [ "$has_io_expander" == "#IO Expander found at 0x00" ]; then
-    echo "done."
+    $ECHO "done."
 else
-    echo "ERROR Something bad happened.\nThe SX1509 IO Expander could not be initialized\n";
+    $ECHO "ERROR Something bad happened.\nThe SX1509 IO Expander could not be initialized\n";
     exit -1;
 fi
 
-    echo "OK: PASS.\nThis prototype board is ready for shipment to Keyboardio.\nThank you!";
+    $ECHO "OK: PASS.\nThis prototype board is ready for shipment to Keyboardio.\nThank you!";
     exit 0;

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 TEMPFILE=$1
 DEVNAME=$2 
@@ -10,16 +10,19 @@ fi
 echo "Make sure there are no Arduinos connected to this computer"
 echo "and then hit RETURN or ENTER"
 read newline
-OLDDEVS=`ls /dev/tty.usbmodem* 2>/dev/null`
-OLDDEVS2=`ls /dev/tty.usbmodem* 2>/dev/null`
-echo "Connect the $DEVNAME USB cable to your computer and hit\nENTER or RETURN\n"
+
+OLDDEVS=`ls /dev/tty*usb*  /dev/tty*ACM* 2>/dev/null`
+OLDDEVS2=`ls /dev/tty*usb* /dev/tty*ACM* 2>/dev/null`
+echo "Connect the $DEVNAME USB cable to your computer and hit"
+echo "ENTER or RETURN"
+
 read newline
 sleep 2; # wait a few seconds to recognize the device
-NEWDEVS=`ls /dev/tty.usbmodem* 2>/dev/null`
+NEWDEVS=`ls /dev/tty*usb* /dev/tty*ACM* 2>/dev/null`
 # we look at the old devices list twice to deal with
 # the user unplugging the device when we tell them to plug it in
-DEVICE=`echo "$OLDDEVS2\n$OLDDEVS\n$NEWDEVS"|sort |uniq -u`
-if [`echo "$OLDDEVS"|wc -l` -gt `echo "$NEWDEVS"|wc -l` ]; then
+DEVICE=`echo "$OLDDEVS2$OLDDEVS$NEWDEVS"|sort |uniq -u`
+if [ `echo "$OLDDEVS"|wc -l` -gt `echo "$NEWDEVS"|wc -l` ]; then
     echo "ERROR: It seems like you unplugged something. Try again?";
     exit -1;
 fi
@@ -29,11 +32,12 @@ if [ "$OLDDEVS" == "$NEWDEVS" ]; then
     exit -1;
 fi
 
-if [`echo "$DEVICE"|wc -l` -lt 1 ]; then
+if [ `echo "$DEVICE"|wc -l` -lt 1 ]; then
     echo "ERROR: Could not find the PCB device. If Step 2 ran ok, maybe our device detection is broken?";
     exit -1;
 elif [ `echo "$DEVICE"|wc -l` -gt 1 ]; then 
     echo "ERROR: Multiple new usbserial devices appeared. Did you plug in two boards?";
+    echo "$DEVICE"
     exit -1;
 else
   echo "" 

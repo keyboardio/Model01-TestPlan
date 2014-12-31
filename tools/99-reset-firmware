@@ -1,16 +1,17 @@
-#!/bin/sh
-
-port_tmp_file=`mktemp -t kbio-port`
+#!/bin/bash
+STTY="stty -F"
+ECHO="echo -e"
+port_tmp_file=`mktemp -t kbio-port-XXXX`
 ./probe-device $port_tmp_file
 DEVICE=`cat $port_tmp_file`
 rm $port_tmp_file
 
-stty -f $DEVICE 1200
+$STTY $DEVICE 1200
 sleep 2
 if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/noop.hex:i; then
-    echo "OK: Flashing worked\nYou can start testing again\n";
+    $ECHO "OK: Flashing worked\nYou can start testing again\n";
     exit 0;
 else 
-    echo "ERROR: Flashing failed\n";
+    $ECHO "ERROR: Flashing failed\n";
     exit -1;
 fi
