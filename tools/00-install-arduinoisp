@@ -12,7 +12,7 @@ if [ "x$DEVICE" == "x" ]; then exit -1; fi
 
 stty -f $DEVICE 1200
 sleep 1
-if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/arduino-isp.hex:i; then
+if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/arduino-isp.hex:i  2> /tmp/keyboardio-log.$$; then
     echo "OK: Flashing worked. Your Arduino is now an ISP.";
     exit 0;
 else 
