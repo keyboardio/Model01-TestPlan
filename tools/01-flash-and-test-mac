@@ -55,6 +55,8 @@ rm $port_tmp_file
 
 
 stty -f $DEVICE 1200
+stty -f $DEVICE 1200
+stty -f $DEVICE 1200
 sleep 2
 if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cavr109 -P$DEVICE -b57600 -D -Uflash:w:../firmware/test.hex:i; then
     echo "OK: Flashing worked\n";

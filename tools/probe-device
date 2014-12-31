@@ -1,7 +1,12 @@
 #!/bin/sh
 
 TEMPFILE=$1
-DEVNAME=$2 || "Arduino ISP"
+DEVNAME=$2 
+
+if [ "x$DEVNAME" == "x" ]; then
+    DEVNAME="Arduino ISP"
+fi
+
 echo "Make sure there are no Arduinos connected to this computer"
 echo "and then hit RETURN or ENTER"
 read newline
