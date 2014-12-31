@@ -1,12 +1,13 @@
 #!/bin/sh
 
 TEMPFILE=$1
+DEVNAME=$2 || "Arduino ISP"
 echo "Make sure there are no Arduinos connected to this computer"
 echo "and then hit RETURN or ENTER"
 read newline
 OLDDEVS=`ls /dev/tty.usbmodem* 2>/dev/null`
 OLDDEVS2=`ls /dev/tty.usbmodem* 2>/dev/null`
-echo "Connect the Arduino Micro's USB cable to your computer and hit\nENTER or RETURN\n"
+echo "Connect the $DEVNAME USB cable to your computer and hit\nENTER or RETURN\n"
 read newline
 sleep 2; # wait a few seconds to recognize the device
 NEWDEVS=`ls /dev/tty.usbmodem* 2>/dev/null`
@@ -15,7 +16,7 @@ NEWDEVS=`ls /dev/tty.usbmodem* 2>/dev/null`
 DEVICE=`echo "$OLDDEVS2\n$OLDDEVS\n$NEWDEVS"|sort |uniq -u`
 if [`echo "$OLDDEVS"|wc -l` -gt `echo "$NEWDEVS"|wc -l` ]; then
     echo "ERROR: It seems like you unplugged something. Try again?";
-#    exit -1;
+    exit -1;
 fi
 
 if [ "$OLDDEVS" == "$NEWDEVS" ]; then
@@ -34,3 +35,4 @@ else
 fi
 
 echo "$DEVICE" > $TEMPFILE
+    exit 0;

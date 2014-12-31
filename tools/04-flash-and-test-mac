@@ -1,9 +1,58 @@
 #!/bin/sh
 
+echo "Connect the Arduino Micro being used as Programmer to the
+ICSP header on the Keyboardio PCB:
+
+Connections on Arduino Micro to Keyboardio PCB:
+
+Arduino     PCB ICSP          ICSP Header:
+=======     ========          MISO  GND
+3V3         3V3               3V3   RESET 
+GND         GND               SCK   MOSI 
+MOSI        MOSI
+MISO        MISO              On the PCB, MISO is on pin 1.
+SCK         SCK               Pin 1 is the SQUARE pin.
+10          RESET";
+
+read xxx
+
 port_tmp_file=`mktemp -t kbio-port`
 ./probe-device $port_tmp_file
 DEVICE=`cat $port_tmp_file`
 rm $port_tmp_file
+
+if [ "x$DEVICE" == "x" ]; then exit -1; fi
+
+stty -f $DEVICE 1200
+
+
+if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cstk500v1 -P$DEVICE -b19200 -e -Ulock:w:0x3F:m -Uefuse:w:0xcb:m -Uhfuse:w:0xd8:m -Ulfuse:w:0xff:m > /tmp/keyboardio-log.$$; then
+    echo "OK: Fuse setting worked\n";
+else 
+    echo "ERROR: Fuse setting failed\n";
+    exit -1;
+fi
+
+
+
+if ../binaries/mac/avrdude/avrdude -V -C../binaries/mac/avrdude/avrdude.conf -patmega32u4 -cstk500v1 -P$DEVICE -b19200 -Uflash:w:../firmware/bootloader.hex:i -Ulock:w:0x2F:m  > /tmp/keyboardio-log.$$; then
+    echo "OK: Flashing worked\n";
+else 
+    echo "ERROR: Flashing setting failed\n";
+    exit -1;
+fi
+
+
+echo "We're done with the ISP Arduino."
+echo "All future commands refer to the MicroUSB port on the LEFT PCB"
+
+port_tmp_file=`mktemp -t kbio-port`
+./probe-device $port_tmp_file "LEFT PCB"
+DEVICE=`cat $port_tmp_file`
+rm $port_tmp_file
+
+
+
 
 stty -f $DEVICE 1200
 sleep 2
@@ -14,6 +63,9 @@ else
     exit -1;
 fi
 
+if [ "x$DEVICE" == "x" ]; then
+    exit -1;
+fi
 
 echo "Testing basic USB device connectivity.\nPlease do not touch the keyboard.\n";
 
