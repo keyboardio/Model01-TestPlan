@@ -1,7 +1,15 @@
 #!/bin/bash
 
-STTY="stty -F"
-ECHO="echo -e"
+if [ "`uname`" == "Linux" ]; then 
+    STTY="stty -F";
+    ECHO="echo -e";
+else
+    ECHO="echo -e";
+    STTY="stty -f";
+fi
+
+
+$ECHO "This program will install the ICSP software on an Arduino Micro."
 
 
 $ECHO "Connect the Arduino Micro being used as Programmer to the
@@ -18,7 +26,6 @@ MISO        MISO              On the PCB, MISO is on pin 1.
 SCK         SCK               Pin 1 is the SQUARE pin.
 10          RESET";
 
-read xxx
 
 port_tmp_file=`mktemp -t kbio-port-XXXX`
 ./probe-device $port_tmp_file

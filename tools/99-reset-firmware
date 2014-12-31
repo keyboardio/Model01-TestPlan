@@ -1,6 +1,13 @@
 #!/bin/bash
-STTY="stty -F"
-ECHO="echo -e"
+
+if [ "`uname`" == "Linux" ]; then 
+    STTY="stty -F";
+    ECHO="echo -e";
+else
+    ECHO="echo -e";
+    STTY="stty -f";
+fi
+
 port_tmp_file=`mktemp -t kbio-port-XXXX`
 ./probe-device $port_tmp_file
 DEVICE=`cat $port_tmp_file`

@@ -1,7 +1,13 @@
 #!/bin/bash
 
-STTY="stty -F"
-ECHO="echo -e"
+if [ "`uname`" == "Linux" ]; then 
+    STTY="stty -F";
+    ECHO="echo -e";
+else
+    ECHO="echo -e";
+    STTY="stty -f";
+fi
+
 
 $ECHO "This program will install the ICSP software on an Arduino Micro."
 $ECHO "This will ERASE your Arduino and install the ArduinoISP software."
