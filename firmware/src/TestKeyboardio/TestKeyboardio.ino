@@ -6,7 +6,12 @@
 //  pin selects. SX1509 breakout defaults to [0:0] (0x3E).
 //const byte SX1509_ADDRESS = 0x3E;  // SX1509 I2C address (00)
 //const byte SX1509_ADDRESS = 0x3F;  // SX1509 I2C address (01)
+
+// This is the "correct" address for the left hand
 const byte SX1509_ADDRESS = 0x70;  // SX1509 I2C address (10)
+
+
+// This is the "correct" address for the right hand
 //const byte SX1509_ADDRESS = 0x71;  // SX1509 I2C address (11)
 sx1509Class sx1509(SX1509_ADDRESS);
 
